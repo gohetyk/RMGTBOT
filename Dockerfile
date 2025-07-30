@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-# نصب ابزارها + Lua 5.4 و کتابخانه‌های dev
+# نصب ابزارها + Lua 5.4
 RUN apt-get update && apt-get install -y \
     lua5.4 \
     lua5.4-dev \
@@ -26,8 +26,8 @@ RUN luarocks install luasocket && \
     luarocks install luasec && \
     luarocks install lua-cjson
 
-# کامپایل tdlua.so از سورس
-RUN git clone https://github.com/sergobot/tdlib-lua.git /tmp/tdlua && \
+# کلون و build tdlua.so از tdlight
+RUN git clone --depth 1 https://github.com/tdlight-team/tdlight-lua.git /tmp/tdlua && \
     cd /tmp/tdlua && \
     cmake . && \
     make && \
