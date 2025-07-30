@@ -1,13 +1,15 @@
 FROM debian:bullseye-slim
 
-# نصب Lua 5.1 به جای 5.4
+# نصب ابزارها + Lua 5.4 و کتابخانه‌های dev
 RUN apt-get update && apt-get install -y \
-    lua5.1 \
-    liblua5.1-0-dev \
+    lua5.4 \
+    lua5.4-dev \
     luarocks \
     gcc \
     g++ \
     make \
+    cmake \
+    git \
     libc-dev \
     libssl-dev \
     zlib1g-dev \
@@ -24,8 +26,12 @@ RUN luarocks install luasocket && \
     luarocks install luasec && \
     luarocks install lua-cjson
 
-# دانلود tdlua.so از Release خودت
-RUN wget -O /app/tdlua.so \
-    https://github.com/gohetyk/RMGTBOT/releases/download/tdlua-v1/tdlua.so
+# کامپایل tdlua.so از سورس
+RUN git clone https://github.com/sergobot/tdlib-lua.git /tmp/tdlua && \
+    cd /tmp/tdlua && \
+    cmake . && \
+    make && \
+    cp tdlua.so /app && \
+    rm -rf /tmp/tdlua
 
-CMD sh -c "redis-server --daemonize yes && lua5.1 JokerBot.lua"
+CMD sh -c "redis-server --daemonize yes && lua5.4 JokerBot.lua"
