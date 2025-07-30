@@ -1,7 +1,17 @@
-FROM alpine:latest
+FROM debian:bullseye-slim
 
-# نصب همه ابزارهای لازم
-RUN apk add --no-cache lua5.4 lua5.4-dev luarocks gcc g++ make musl-dev redis wget unzip
+# نصب ابزارها و پکیج‌های لازم
+RUN apt-get update && apt-get install -y \
+    lua5.4 \
+    lua5.4-dev \
+    luarocks \
+    gcc \
+    g++ \
+    make \
+    redis-server \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . .
