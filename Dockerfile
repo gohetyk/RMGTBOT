@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-# نصب LuaJIT + ابزارها
+# نصب LuaJIT و ابزارها
 RUN apt-get update && apt-get install -y \
     luajit \
     libluajit-5.1-dev \
@@ -8,8 +8,6 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     make \
-    cmake \
-    git \
     libc-dev \
     libssl-dev \
     zlib1g-dev \
@@ -21,17 +19,13 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . .
 
-# نصب کتابخانه‌های Lua (بدون suffix)
+# نصب کتابخانه‌های Lua
 RUN luarocks install luasocket && \
     luarocks install luasec && \
     luarocks install lua-cjson
 
-# کلون و build tdlua.so از سورس پایدار
-RUN git clone --depth 1 https://github.com/kennyledet/tdlua.git /tmp/tdlua && \
-    cd /tmp/tdlua && \
-    cmake -DLUA_INCLUDE_DIR=/usr/include/luajit-2.1 -DLUA_LIBRARY=/usr/lib/x86_64-linux-gnu/libluajit-5.1.so . && \
-    make && \
-    cp tdlua.so /app && \
-    rm -rf /tmp/tdlua
+# دانلود tdlua.so آماده از Release خودت
+RUN wget -O /app/tdlua.so \
+    https://github.com/gohetyk/RMGTBOT/releases/download/tdlua-v1/tdlua.so
 
 CMD sh -c "redis-server --daemonize yes && luajit JokerBot.lua"
