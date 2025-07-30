@@ -21,10 +21,10 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . .
 
-# نصب کتابخانه‌های Lua روی LuaJIT
-RUN luarocks --lua-suffix=jit install luasocket && \
-    luarocks --lua-suffix=jit install luasec && \
-    luarocks --lua-suffix=jit install lua-cjson
+# نصب کتابخانه‌های Lua (بدون suffix)
+RUN luarocks install luasocket && \
+    luarocks install luasec && \
+    luarocks install lua-cjson
 
 # کلون و build tdlua.so از سورس پایدار
 RUN git clone --depth 1 https://github.com/kennyledet/tdlua.git /tmp/tdlua && \
