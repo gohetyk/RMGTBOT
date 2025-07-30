@@ -3,7 +3,6 @@ FROM debian:bullseye-slim
 # نصب LuaJIT و ابزارها
 RUN apt-get update && apt-get install -y \
     luajit \
-    libluajit-5.1-dev \
     luarocks \
     gcc \
     g++ \
@@ -19,13 +18,10 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . .
 
-# نصب کتابخانه‌های Lua
+# نصب کتابخانه‌های Lua مورد نیاز
 RUN luarocks install luasocket && \
     luarocks install luasec && \
-    luarocks install lua-cjson
+    luarocks install dkjson || true
 
-# دانلود tdlua.so آماده از Release خودت
-RUN wget -O /app/tdlua.so \
-    https://github.com/gohetyk/RMGTBOT/releases/download/tdlua-v1/tdlua.so
-
+# اجرای Redis و سپس اجرای ربات
 CMD sh -c "redis-server --daemonize yes && luajit JokerBot.lua"
