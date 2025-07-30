@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-# نصب ابزارها و پکیج‌های لازم
+# نصب ابزارهای لازم + وابستگی‌ها
 RUN apt-get update && apt-get install -y \
     lua5.4 \
     lua5.4-dev \
@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     make \
+    libc-dev \
+    libssl-dev \
+    liblua5.4-dev \
+    zlib1g-dev \
     redis-server \
     wget \
     unzip \
