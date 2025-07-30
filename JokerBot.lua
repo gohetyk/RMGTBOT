@@ -9,6 +9,7 @@ assert(TOKEN and TOKEN:match("^%d+:%S+$"), "TOKEN env var is missing or invalid"
 local ok_dkjson, dkjson = pcall(function() return (loadfile("./Lib/dkjson.lua"))() end)
 if not ok_dkjson then dkjson = require("dkjson") end
 
+-- فراخوانی Bot API
 local function api(method, params)
   local base = "https://api.telegram.org/bot" .. TOKEN .. "/" .. method
   if params and next(params) then
@@ -26,15 +27,42 @@ local function api(method, params)
 end
 
 local function sendMessage(chat_id, text, reply_to)
-  api("sendMessage", {chat_id = tostring(chat_id), text = text, reply_to_message_id = reply_to})
+  api("sendMessage", {
+    chat_id = tostring(chat_id),
+    text = tostring(text),
+    parse_mode = "HTML",
+    reply_to_message_id = reply_to
+  })
 end
 
--- اینجا دستورات رو صدا می‌زنیم
+-- دستورات و سیاست‌ها
 local function handle_commands(msg)
+  -- دستور /start
   if msg.text:match("^/start") then
     sendMessage(msg.chat.id, "سلام! ربات با موفقیت ران شد ✅", msg.message_id)
+
+  -- دستور /help
   elseif msg.text:match("^/help") then
-    sendMessage(msg.chat.id, "راهنمای کامل ربات بزودی اضافه می‌شود", msg.message_id)
+    sendMessage(msg.chat.id, [[
+🔹 راهنمای ربات 🔹
+
+/start - شروع کار با ربات
+/help - همین راهنما
+
+📌 وقتی ربات ادمین باشد:
+- لینک‌های گروه را حذف می‌کند.
+]], msg.message_id)
+
+  -- حذف لینک‌ها (فقط در گروه‌ها)
+  else
+    if msg.chat.type and msg.chat.type:match("group") then
+      if msg.text:match("https?://") or msg.text:match("t%.me") then
+        api("deleteMessage", {
+          chat_id = tostring(msg.chat.id),
+          message_id = tostring(msg.message_id)
+        })
+      end
+    end
   end
 end
 
