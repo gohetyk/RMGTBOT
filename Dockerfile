@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-# نصب ابزارهای لازم + وابستگی‌ها
+# نصب ابزارها و کتابخانه‌های لازم برای build
 RUN apt-get update && apt-get install -y \
     lua5.4 \
     lua5.4-dev \
@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     liblua5.4-dev \
     zlib1g-dev \
     redis-server \
+    git \
+    cmake \
     wget \
     unzip \
     && rm -rf /var/lib/apt/lists/*
@@ -25,7 +27,12 @@ RUN luarocks install luasocket && \
     luarocks install luasec && \
     luarocks install lua-cjson
 
-# دانلود tdlua.so (لینک جدید و فعال)
-RUN wget -O tdlua.so https://github.com/tdlight-team/tdlight/releases/download/v0.6.0/tdlua.so
+# دانلود و build tdlib-lua برای ساخت tdlua.so
+RUN git clone https://github.com/sergobot/tdlib-lua.git /tmp/tdlua && \
+    cd /tmp/tdlua && \
+    cmake . && \
+    make && \
+    cp tdlua.so /app && \
+    rm -rf /tmp/tdlua
 
 CMD sh -c "redis-server --daemonize yes && lua JokerBot.lua"
