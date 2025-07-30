@@ -1,9 +1,9 @@
 FROM debian:bullseye-slim
 
-# نصب ابزارها + Lua 5.4
+# نصب LuaJIT + ابزارها
 RUN apt-get update && apt-get install -y \
-    lua5.4 \
-    lua5.4-dev \
+    luajit \
+    libluajit-5.1-dev \
     luarocks \
     gcc \
     g++ \
@@ -21,17 +21,17 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . .
 
-# نصب کتابخانه‌های Lua
-RUN luarocks install luasocket && \
-    luarocks install luasec && \
-    luarocks install lua-cjson
+# نصب کتابخانه‌های Lua روی LuaJIT
+RUN luarocks --lua-suffix=jit install luasocket && \
+    luarocks --lua-suffix=jit install luasec && \
+    luarocks --lua-suffix=jit install lua-cjson
 
-# کلون و build tdlua.so از tdlight
-RUN git clone --depth 1 https://github.com/tdlight-team/tdlight-lua.git /tmp/tdlua && \
+# کلون و build tdlua.so از سورس پایدار
+RUN git clone --depth 1 https://github.com/kennyledet/tdlua.git /tmp/tdlua && \
     cd /tmp/tdlua && \
-    cmake . && \
+    cmake -DLUA_INCLUDE_DIR=/usr/include/luajit-2.1 -DLUA_LIBRARY=/usr/lib/x86_64-linux-gnu/libluajit-5.1.so . && \
     make && \
     cp tdlua.so /app && \
     rm -rf /tmp/tdlua
 
-CMD sh -c "redis-server --daemonize yes && lua5.4 JokerBot.lua"
+CMD sh -c "redis-server --daemonize yes && luajit JokerBot.lua"
