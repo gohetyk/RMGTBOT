@@ -25,7 +25,7 @@ RUN luarocks install luasocket && \
     luarocks install luasec && \
     luarocks install lua-cjson
 
-# دانلود tdlua.so
-RUN wget -O tdlua.so https://github.com/tdlight-team/tdlight-telegram-bot-api/releases/download/v1.8.0/tdlua.so
+# دانلود tdlua.so (لینک جدید و فعال)
+RUN wget -O tdlua.so https://github.com/tdlight-team/tdlight/releases/download/v0.6.0/tdlua.so
 
 CMD sh -c "redis-server --daemonize yes && lua JokerBot.lua"
